@@ -2,18 +2,20 @@
 stl-reader
 ==========
 
-``stl-reader`` is a Python library for reading binary STL files. It wraps a Cython interface to the fast STL library provided by `libstl <https://github.com/aki5/libstl>`_. Thanks @aki5!
+``stl-reader`` is a Python library for raipidly reading binary STL files. It wraps a
+Cython interface to the fast STL library provided by `libstl
+<https://github.com/aki5/libstl>`_. Thanks @aki5!
 
 .. image:: https://img.shields.io/pypi/v/stl_reader.svg
     :target: https://pypi.org/project/stl_reader/
 
 
 The main advantage of ``stl-reader`` over other STL reading libraries is its
-performance. It is particularly well-suited for large files, and it merges
-faces faster than VTK, mainly due to its efficient use of hashing when merging
-points. This results in a 5-35x speedup over VTK for files containing between
-4,000 and 9,000,000 points.
+performance. It is particularly well-suited for large files, mainly due to its
+efficient use of hashing when merging points. This results in a 5-35x speedup
+over VTK for files containing between 4,000 and 9,000,000 points.
 
+See the benchmarks below for more details.
 
 Installation
 ============
@@ -125,13 +127,13 @@ Benchmark
 
 License and Acknowledgments
 ===========================
+This project relies on `Libstl <https://github.com/aki5/libstl>`_ for reading
+in and merging the vertices of a STL file. Wherever code is reused, the original `MIT License <https://github.com/aki5/libstl/blob/master/LICENSE>`_ is mentioned.
 
-
-
+The work in this repository is also licensed under the MIT License.
 
 Support
 =======
 
-If you are having issues, please raise an `Issue
-<https://github.com/pyvista/stl_reader/issues>`_
+If you are having issues, please feel free to raise an `Issue <https://github.com/pyvista/stl_reader/issues>`_.
 
