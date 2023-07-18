@@ -74,6 +74,9 @@ setup(
             )
         ]
     ),
+    package_data={
+        "stl_reader": ["*.pyx"],  # include all .pyx files in the package
+    },
     keywords="read stl",
     install_requires=["numpy>1.11.0"],
 )

@@ -1,3 +1,8 @@
+# See https://pre-commit.ci/
+ci:
+    autofix_prs: true
+    autoupdate_schedule: quarterly
+
 repos:
 - repo: https://github.com/psf/black
   rev: 23.7.0
@@ -53,10 +58,15 @@ repos:
   - id: clang-format
     files: |
       (?x)^(
-        stl_reader/cython/[^_].*\.c.*
+        stl_reader/[^_].*\.c.*
       )$
 
 - repo: https://github.com/python-jsonschema/check-jsonschema
   rev: 0.23.3
   hooks:
     - id: check-github-workflows
+
+- repo: https://github.com/dzhu/rstfmt
+  rev: v0.0.13
+  hooks:
+  - id: rstfmt
