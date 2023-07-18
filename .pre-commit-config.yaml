@@ -58,7 +58,7 @@ repos:
   - id: clang-format
     files: |
       (?x)^(
-        stl_reader/cython/[^_].*\.c.*
+        stl_reader/[^_].*\.c.*
       )$
 
 - repo: https://github.com/python-jsonschema/check-jsonschema
