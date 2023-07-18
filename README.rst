@@ -155,9 +155,9 @@ Here's an additional benchmark comparing VTK with ``stl-reader``
    plt.ylabel('Time to Load (seconds)')
    plt.show()
 
-.. image:: bench0.png
+.. image:: https://github.com/pyvista/stl-reader/raw/main/bench0.png
 
-.. image:: bench1.png
+.. image:: https://github.com/pyvista/stl-reader/raw/main/bench0.png
 
 *****************************
  License and Acknowledgments
