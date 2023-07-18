@@ -98,7 +98,7 @@ Here are some timings from reading in a 1,000,000 point binary STL file:
 +=============+=======================+
 | stl-reader  | 0.174                 |
 +-------------+-----------------------+
-| numpy-stl   | 0.201 (see note       |
+| numpy-stl   | 0.201 (see note)      |
 +-------------+-----------------------+
 | PyVista     | 1.663                 |
 | (VTK)       |                       |
