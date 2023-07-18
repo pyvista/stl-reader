@@ -82,17 +82,20 @@ leverage the performant `libstl <https://github.com/aki5/libstl>` library.
 
 Here are some timings from reading in a 1,000,000 point binary STL file:
 
-=============  ===================
+=============  ===============
 Library        Time (seconds)
-=============  ===================
-stl-reader     0.17492270469665527
-PyVista (VTK)  1.66347336769104
-meshio         4.45120644569397
-numpy-stl      0.2015397548675537
-=============  ===================
+=============  ===============
+stl-reader     0.174
+numpy-stl*     0.201
+PyVista (VTK)  1.663
+meshio         4.451
+=============  ===============
 
-.. note::
-   ``numpy-stl`` does not merge vertices.
+**Note** ``numpy-stl`` does not merge duplicate vertices.
+
+
+Comparison with VTK
+-------------------
 
 Here's an additional benchmark comparing VTK with ``stl-reader``
 
