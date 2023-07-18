@@ -1,0 +1,9 @@
+# Pip generated
+*.egg-info/
+build/
+dist/
+
+# Compiled
+stl_reader/_stlfile_wrapper.c
+*.so
+*.pyc

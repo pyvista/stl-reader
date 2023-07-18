@@ -1,0 +1,62 @@
+repos:
+- repo: https://github.com/psf/black
+  rev: 23.7.0
+  hooks:
+  - id: black
+
+- repo: https://github.com/keewis/blackdoc
+  rev: v0.3.8
+  hooks:
+  - id: blackdoc
+    exclude: README.rst
+
+- repo: https://github.com/pycqa/isort
+  rev: 5.12.0
+  hooks:
+  - id: isort
+    exclude: "setup.py"
+    args: [
+    "--profile", "black",
+    "--force-sort-within-sections",
+    "--skip-glob", "*__init__.py",
+    ]
+
+- repo: https://github.com/PyCQA/flake8
+  rev: 6.0.0
+  hooks:
+  - id: flake8
+
+- repo: https://github.com/codespell-project/codespell
+  rev: v2.2.5
+  hooks:
+  - id: codespell
+    args: ["--skip=*.vt*"]
+
+- repo: https://github.com/pycqa/pydocstyle
+  rev: 6.3.0
+  hooks:
+  - id: pydocstyle
+    additional_dependencies: [tomli==2.0.1]
+    files: ^femorph/.*\.py
+
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v4.4.0
+  hooks:
+  - id: check-merge-conflict
+  - id: debug-statements
+  - id: trailing-whitespace
+    exclude: .*\.cdb$
+
+- repo: https://github.com/pre-commit/mirrors-clang-format
+  rev: v16.0.6
+  hooks:
+  - id: clang-format
+    files: |
+      (?x)^(
+        stl_reader/cython/[^_].*\.c.*
+      )$
+
+- repo: https://github.com/python-jsonschema/check-jsonschema
+  rev: 0.23.3
+  hooks:
+    - id: check-github-workflows
