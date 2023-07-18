@@ -38,7 +38,7 @@ You can also clone the repository and install it from source:
 Usage
 =====
 
-Load in the vertices and indices of a stl file directly as a Numpy array:
+Load in the vertices and indices of a STL file directly as a NumPy array:
 
 .. code:: pycon
 
@@ -55,7 +55,10 @@ Load in the vertices and indices of a stl file directly as a Numpy array:
     >>> indices
     array([   0,    1,    2, ..., 3694, 3693, 3688], dtype=uint32)
 
-In this example, ``vertices`` is a 2D NumPy array where each row represents a vertex and the three columns represent the X, Y, and Z coordinates, respectively. ``indices`` is a 1D NumPy array representing the triangles from the STL file.
+In this example, ``vertices`` is a 2D NumPy array where each row represents a
+vertex and the three columns represent the X, Y, and Z coordinates,
+respectively. ``indices`` is a 1D NumPy array representing the triangles from
+the STL file.
 
 Alternatively, you can load in the STL file as a PyVista PolyData:
 
