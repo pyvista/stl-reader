@@ -77,6 +77,24 @@ Alternatively, you can load in the STL file as a PyVista PolyData:
 
 Benchmark
 =========
+The main reason behind writing yet another STL file reader for Python is to
+leverage the performant `libstl <https://github.com/aki5/libstl>` library.
+
+Here are some timings from reading in a 1,000,000 point binary STL file:
+
+=============  ===================
+Library        Time (seconds)
+=============  ===================
+stl-reader     0.17492270469665527
+PyVista (VTK)  1.66347336769104
+meshio         4.45120644569397
+numpy-stl      0.2015397548675537
+=============  ===================
+
+.. note::
+   ``numpy-stl`` does not merge vertices.
+
+Here's an additional benchmark comparing VTK with ``stl-reader``
 
 .. code:: python
 
@@ -127,7 +145,7 @@ Benchmark
 
 License and Acknowledgments
 ===========================
-This project relies on `Libstl <https://github.com/aki5/libstl>`_ for reading
+This project relies on `libstl <https://github.com/aki5/libstl>`_ for reading
 in and merging the vertices of a STL file. Wherever code is reused, the original `MIT License <https://github.com/aki5/libstl/blob/master/LICENSE>`_ is mentioned.
 
 The work in this repository is also licensed under the MIT License.
