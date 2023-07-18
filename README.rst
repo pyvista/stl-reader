@@ -6,8 +6,8 @@ stl-reader
 Cython interface to the fast STL library provided by `libstl
 <https://github.com/aki5/libstl>`_. Thanks @aki5!
 
-.. image:: https://img.shields.io/pypi/v/stl_reader.svg
-    :target: https://pypi.org/project/stl_reader/
+.. image:: https://img.shields.io/pypi/v/stl-reader.svg
+    :target: https://pypi.org/project/stl-reader/
 
 
 The main advantage of ``stl-reader`` over other STL reading libraries is its
@@ -30,8 +30,8 @@ You can also clone the repository and install it from source:
 
 .. code:: sh
 
-    git clone https://github.com/pyvista/stl_reader.git
-    cd stl_reader
+    git clone https://github.com/pyvista/stl-reader.git
+    cd stl-reader
     pip install .
 
 
@@ -156,5 +156,5 @@ The work in this repository is also licensed under the MIT License.
 Support
 =======
 
-If you are having issues, please feel free to raise an `Issue <https://github.com/pyvista/stl_reader/issues>`_.
+If you are having issues, please feel free to raise an `Issue <https://github.com/pyvista/stl-reader/issues>`_.
 
