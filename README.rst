@@ -88,7 +88,7 @@ Alternatively, you can load in the STL file as a PyVista PolyData:
 ***********
 
 The main reason behind writing yet another STL file reader for Python is
-to leverage the performant `libstl <https://github.com/aki5/libstl>`
+to leverage the performant `libstl <https://github.com/aki5/libstl>`_
 library.
 
 Here are some timings from reading in a 1,000,000 point binary STL file:
