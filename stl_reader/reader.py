@@ -21,7 +21,7 @@ def _polydata_from_faces(points, faces):
         import pyvista as pv
     except ModuleNotFoundError:
         raise ModuleNotFoundError(
-            "To use this functionality, install PyVista with\n\npipinstall pyvista"
+            "To use this functionality, install PyVista with\n\npip install pyvista"
         )
 
     from pyvista import ID_TYPE
@@ -83,7 +83,13 @@ def read(filename):
            [ 0.56178033, -0.5952229 ,  0.57455426],
            [ 0.57455426, -0.56178033,  0.5952229 ]], dtype=float32)
     >>> indices
-    array([   0,    1,    2, ..., 3694, 3693, 3688], dtype=uint32)
+    array([[      0,       1,       2],
+           [      1,       3,       4],
+           [      4,       5,       2],
+           ...,
+           [9005998, 9005988, 9005999],
+           [9005999, 9005996, 9005995],
+           [9005998, 9005999, 9005995]], dtype=uint32)
 
     """
     return _stlfile_wrapper.get_stl_data(filename)
