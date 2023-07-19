@@ -1,3 +1,7 @@
+# cython: language_level=3
+# cython: boundscheck=False
+# cython: wraparound=False
+# cython: cdivision=True
 
 # Import the Python-level symbols of numpy
 import numpy as np
@@ -51,8 +55,6 @@ cdef class ArrayWrapper:
         free(<void*>self.data_ptr)
 
 
-@cython.boundscheck(False)
-@cython.wraparound(False)
 def get_stl_data(str filename):
     cdef:
         FILE *fp
