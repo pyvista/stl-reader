@@ -57,7 +57,7 @@ setup(
         "Programming Language :: Python :: 3.11",
     ],
     python_requires=">=3.8",
-    url="https://github.com/pyvista/pymeshfix",
+    url="https://github.com/pyvista/stl-reader",
     # Build cython modules
     ext_modules=cythonize(
         [

@@ -60,7 +60,13 @@ array:
           [ 0.56178033, -0.5952229 ,  0.57455426],
           [ 0.57455426, -0.56178033,  0.5952229 ]], dtype=float32)
    >>> indices
-   array([   0,    1,    2, ..., 3694, 3693, 3688], dtype=uint32)
+   array([[      0,       1,       2],
+          [      1,       3,       4],
+          [      4,       5,       2],
+          ...,
+          [9005998, 9005988, 9005999],
+          [9005999, 9005996, 9005995],
+          [9005998, 9005999, 9005995]], dtype=uint32)
 
 In this example, ``vertices`` is a 2D NumPy array where each row
 represents a vertex and the three columns represent the X, Y, and Z
@@ -88,7 +94,7 @@ Alternatively, you can load in the STL file as a PyVista PolyData:
 ***********
 
 The main reason behind writing yet another STL file reader for Python is
-to leverage the performant `libstl <https://github.com/aki5/libstl>`
+to leverage the performant `libstl <https://github.com/aki5/libstl>`_
 library.
 
 Here are some timings from reading in a 1,000,000 point binary STL file:
@@ -98,7 +104,7 @@ Here are some timings from reading in a 1,000,000 point binary STL file:
 +=============+=======================+
 | stl-reader  | 0.174                 |
 +-------------+-----------------------+
-| numpy-stl   | 0.201 (see note       |
+| numpy-stl   | 0.201 (see note)      |
 +-------------+-----------------------+
 | PyVista     | 1.663                 |
 | (VTK)       |                       |
@@ -111,7 +117,7 @@ Here are some timings from reading in a 1,000,000 point binary STL file:
 Comparison with VTK
 ===================
 
-Here's an additional benchmark comparing VTK with ``stl-reader``
+Here's an additional benchmark comparing VTK with ``stl-reader``:
 
 .. code:: python
 
