@@ -1,4 +1,5 @@
 """Read a STL file using a wrapper of https://github.com/aki5/libstl."""
+
 import numpy as np
 from stl_reader import _stlfile_wrapper
 
