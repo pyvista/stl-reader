@@ -36,6 +36,9 @@ test-requires = "pytest pyvista"
 [tool.cibuildwheel.macos]
 archs = ["native"]
 
+[tool.cibuildwheel.macos.environment]
+MACOSX_DEPLOYMENT_TARGET = "10.14"  # Needed for full C++17 support on MacOS
+
 [tool.codespell]
 quiet-level = 3
 skip = '*.cxx,*.h,*.gif,*.png,*.jpg,*.js,*.html,*.doctree,*.ttf,*.woff,*.woff2,*.eot,*.mp4,*.inv,*.pickle,*.ipynb,flycheck*,./.git/*,./.hypothesis/*,*.yml,./doc/build/*,./doc/images/*,./dist/*,*~,.hypothesis*,*.cpp,*.c'
