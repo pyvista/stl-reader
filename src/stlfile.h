@@ -28,4 +28,5 @@ typedef uint32_t triangle_t;
 typedef uint32_t halfedge_t;
 
 // load stl file, compute and return an indexed triangle mesh
-int loadstl(FILE *fp, char *comment, float **vertp, vertex_t *nvertp, vertex_t **trip, uint16_t **attrp, triangle_t *ntrip);
+int loadstl(FILE *fp, char *comment, float **vertp, vertex_t *nvertp,
+            vertex_t **trip, uint16_t **attrp, triangle_t *ntrip);

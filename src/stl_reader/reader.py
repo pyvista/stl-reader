@@ -1,7 +1,8 @@
 """Read a STL file using a wrapper of https://github.com/aki5/libstl."""
 
 import numpy as np
-from stl_reader import _stlfile_wrapper
+
+from stl_reader import stl_reader as _stlfile_wrapper
 
 
 def _polydata_from_faces(points, faces):
