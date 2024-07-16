@@ -26,8 +26,9 @@ jobs:
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.19.2
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
+          name: stl-reader-wheels-${{ matrix.os }}
           path: ./wheelhouse/*.whl
 
   build_sdist:
@@ -51,8 +52,9 @@ jobs:
           pip install pyvista pytest
           pytest -x
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
+          name: stl-reader-sdist
           path: dist/*.tar.gz
 
   upload_pypi:
@@ -60,10 +62,15 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')  # upload to PyPI on every tag
     steps:
-      - uses: actions/download-artifact@v3
-        with:
-          name: artifact
-          path: dist
+      - uses: actions/download-artifact@v4
+      - name: Flatten directory structure
+        run: |
+          mkdir -p dist/
+          find . -name '*.whl' -exec mv {} dist/ \;
+          find . -name '*.tar.gz' -exec mv {} dist/ \;
+
+      - name: List artifacts
+        run: ls -R
 
       - uses: pypa/gh-action-pypi-publish@v1.9.0
         with:
