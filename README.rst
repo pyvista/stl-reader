@@ -162,47 +162,6 @@ Here's an additional benchmark comparing VTK with ``stl-reader``:
    plt.ylabel('Time to Load (seconds)')
    plt.legend()
    plt.show()
-   import numpy as np
-   import time
-   import pyvista as pv
-   import matplotlib.pyplot as plt
-   import stl_reader
-
-   times = []
-   filename = 'tmp.stl'
-   for res in range(50, 800, 50):
-       mesh = pv.Plane(i_resolution=res, j_resolution=res).triangulate().subdivide(2)
-       mesh.save(filename)
-
-       tstart = time.time()
-       out_pv = pv.read(filename)
-       vtk_time = time.time() - tstart
-
-       tstart = time.time()
-       out_stl = stl_reader.read(filename)
-       stl_reader_time =  time.time() - tstart
-
-       times.append([mesh.n_points, vtk_time, stl_reader_time])
-       print(times[-1])
-
-
-   times = np.array(times)
-   plt.figure(1)
-   plt.title('STL load time')
-   plt.plot(times[:, 0], times[:, 1], label='VTK')
-   plt.plot(times[:, 0], times[:, 2], label='stl_reader')
-   plt.xlabel('Number of Points')
-   plt.ylabel('Time to Load (seconds)')
-   plt.legend()
-
-   plt.figure(2)
-   plt.title('STL load time (Log-Log)')
-   plt.loglog(times[:, 0], times[:, 1], label='VTK')
-   plt.loglog(times[:, 0], times[:, 2], label='stl_reader')
-   plt.xlabel('Number of Points')
-   plt.ylabel('Time to Load (seconds)')
-   plt.legend()
-   plt.show()
 
 .. image:: https://github.com/pyvista/stl-reader/raw/main/bench0.png
 
