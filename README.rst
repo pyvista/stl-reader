@@ -32,6 +32,12 @@ The recommended way to install ``stl-reader`` is via PyPI:
 
    pip install stl-reader
 
+Optionally with PyVista:
+
+.. code:: sh
+
+   pip install stl-reader[pyvista]
+
 You can also clone the repository and install it from source:
 
 .. code:: sh
