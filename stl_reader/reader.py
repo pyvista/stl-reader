@@ -25,25 +25,17 @@ def _polydata_from_faces(points, faces):
             "To use this functionality, install PyVista with:\n\npip install pyvista"
         )
 
-    from pyvista import ID_TYPE
-    from vtkmodules.util.numpy_support import numpy_to_vtk, vtkConstants
-    from vtkmodules.vtkCommonDataModel import vtkCellArray
+    from pyvista import ID_TYPE, CellArray
 
     if faces.ndim != 2:
         raise ValueError("Expected a two dimensional face array.")
-    if faces.dtype != ID_TYPE:
-        faces = faces.astype(ID_TYPE)
 
+    # zero copy polydata creation
+    offset = np.arange(0, faces.size + 1, faces.shape[1], dtype=ID_TYPE)
     pdata = pv.PolyData()
     pdata.points = points
+    pdata.faces = CellArray.from_arrays(offset, faces)
 
-    carr = vtkCellArray()
-    offset = np.arange(0, faces.size + 1, faces.shape[1], dtype=ID_TYPE)
-    carr.SetData(
-        numpy_to_vtk(offset, deep=False, array_type=vtkConstants.VTK_ID_TYPE),  # type: ignore
-        numpy_to_vtk(faces.ravel(), deep=False, array_type=vtkConstants.VTK_ID_TYPE),  # type: ignore
-    )
-    pdata.SetPolys(carr)
     return pdata
 
 
