@@ -56,6 +56,7 @@ setup(
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
     ],
     python_requires=">=3.8",
     url="https://github.com/pyvista/stl-reader",
@@ -76,7 +77,7 @@ setup(
         ]
     ),
     package_data={
-        "stl_reader": ["*.pyx"],  # include all .pyx files in the package
+        "stl_reader": ["*.pyx", "*.h", "stlfile.c", "_stlfile_wrapper.c"],
     },
     keywords="read stl",
     install_requires=["numpy>1.11.0,<2.0"],
