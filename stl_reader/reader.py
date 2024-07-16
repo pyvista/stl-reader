@@ -1,4 +1,5 @@
 """Read a STL file using a wrapper of https://github.com/aki5/libstl."""
+
 import numpy as np
 from stl_reader import _stlfile_wrapper
 
@@ -21,27 +22,20 @@ def _polydata_from_faces(points, faces):
         import pyvista as pv
     except ModuleNotFoundError:
         raise ModuleNotFoundError(
-            "To use this functionality, install PyVista with\n\npip install pyvista"
+            "To use this functionality, install PyVista with:\n\npip install pyvista"
         )
 
-    from pyvista import ID_TYPE
-
-    try:
-        from pyvista.core.utilities import numpy_to_idarr
-    except ModuleNotFoundError:  # pragma: no cover
-        from pyvista.utilities.cells import numpy_to_idarr
-    from vtkmodules.vtkCommonDataModel import vtkCellArray
+    from pyvista import ID_TYPE, CellArray
 
     if faces.ndim != 2:
         raise ValueError("Expected a two dimensional face array.")
 
+    # zero copy polydata creation
+    offset = np.arange(0, faces.size + 1, faces.shape[1], dtype=ID_TYPE)
     pdata = pv.PolyData()
     pdata.points = points
+    pdata.faces = CellArray.from_arrays(offset, faces)
 
-    carr = vtkCellArray()
-    offset = np.arange(0, faces.size + 1, faces.shape[1], dtype=ID_TYPE)
-    carr.SetData(numpy_to_idarr(offset, deep=True), numpy_to_idarr(faces, deep=True))
-    pdata.SetPolys(carr)
     return pdata
 
 
