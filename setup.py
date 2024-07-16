@@ -1,4 +1,5 @@
 """Setup for stl-reader."""
+
 from io import open as io_open
 import os
 import sys
@@ -78,5 +79,5 @@ setup(
         "stl_reader": ["*.pyx"],  # include all .pyx files in the package
     },
     keywords="read stl",
-    install_requires=["numpy>1.11.0"],
+    install_requires=["numpy>1.11.0,<2.0"],
 )
