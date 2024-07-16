@@ -1,8 +1,0 @@
-/home/alex/source/stl-reader/CMakeFiles/stl_reader.dir
-/home/alex/source/stl-reader/CMakeFiles/nanobind-static.dir
-/home/alex/source/stl-reader/CMakeFiles/edit_cache.dir
-/home/alex/source/stl-reader/CMakeFiles/rebuild_cache.dir
-/home/alex/source/stl-reader/CMakeFiles/list_install_components.dir
-/home/alex/source/stl-reader/CMakeFiles/install.dir
-/home/alex/source/stl-reader/CMakeFiles/install/local.dir
-/home/alex/source/stl-reader/CMakeFiles/install/strip.dir

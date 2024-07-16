@@ -1,1 +1,0 @@
-/usr/bin/c++ -fPIC -shared  -o stl_reader.cpython-312-x86_64-linux-gnu.so CMakeFiles/stl_reader.dir/src/stlfile_wrapper.cpp.o  libnanobind-static.a
