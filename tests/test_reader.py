@@ -1,4 +1,5 @@
 """Test stl_reader."""
+
 import numpy as np
 import pytest
 import pyvista as pv
