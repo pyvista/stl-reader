@@ -4,9 +4,9 @@ on:
   pull_request:
   push:
     tags:
-      - "*"
+    - '*'
     branches:
-      - "main"
+    - main
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -21,65 +21,65 @@ jobs:
         os: [ubuntu-latest, windows-latest, macos-14, macos-13]
 
     steps:
-      - uses: actions/checkout@v4
+    - uses: actions/checkout@v4
 
-      - name: Build wheels
-        uses: pypa/cibuildwheel@v2.19.2
+    - name: Build wheels
+      uses: pypa/cibuildwheel@v2.19.2
 
-      - uses: actions/upload-artifact@v4
-        with:
-          name: stl-reader-wheels-${{ matrix.os }}
-          path: ./wheelhouse/*.whl
+    - uses: actions/upload-artifact@v4
+      with:
+        name: stl-reader-wheels-${{ matrix.os }}
+        path: ./wheelhouse/*.whl
 
   build_sdist:
     name: Build source distribution
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+    - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
 
-      - name: Build sdist
-        run: pipx run build --sdist
+    - name: Build sdist
+      run: pipx run build --sdist
 
-      - name: Install from sdist
-        run: pip install dist/stl_reader*.tar.gz
+    - name: Install from sdist
+      run: pip install dist/stl*.tar.gz
 
-      - name: Run tests
-        run: |
-          pip install pyvista pytest
-          pytest -x
+    - name: Run tests
+      run: |
+        pip install pyvista pytest
+        pytest -x
 
-      - uses: actions/upload-artifact@v4
-        with:
-          name: stl-reader-sdist
-          path: dist/*.tar.gz
+    - uses: actions/upload-artifact@v4
+      with:
+        name: stl-reader-sdist
+        path: dist/*.tar.gz
 
   upload_pypi:
     needs: [build_wheels, build_sdist]
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')  # upload to PyPI on every tag
     steps:
-      - uses: actions/download-artifact@v4
-      - name: Flatten directory structure
-        run: |
-          mkdir -p dist/
-          find . -name '*.whl' -exec mv {} dist/ \;
-          find . -name '*.tar.gz' -exec mv {} dist/ \;
+    - uses: actions/download-artifact@v4
+    - name: Flatten directory structure
+      run: |
+        mkdir -p dist/
+        find . -name '*.whl' -exec mv {} dist/ \;
+        find . -name '*.tar.gz' -exec mv {} dist/ \;
 
-      - name: List artifacts
-        run: ls -R
+    - name: List artifacts
+      run: ls -R
 
-      - uses: pypa/gh-action-pypi-publish@v1.9.0
-        with:
-          user: __token__
-          password: ${{ secrets.PYPI_TOKEN }}
+    - uses: pypa/gh-action-pypi-publish@v1.9.0
+      with:
+        user: __token__
+        password: ${{ secrets.PYPI_TOKEN }}
 
-      - name: Release
-        uses: softprops/action-gh-release@v2
-        with:
-          generate_release_notes: true
-          files: |
-            ./dist/*.whl
+    - name: Release
+      uses: softprops/action-gh-release@v2
+      with:
+        generate_release_notes: true
+        files: |
+          ./dist/*.whl

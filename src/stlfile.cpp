@@ -21,10 +21,20 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
-Also modified by Alex Kaszynski 2023 to check is the file is ASCII and the
-elimination of stderr.
+Also modified by Alex Kaszynski 2023-2024:
+- Check is the file is ASCII and the elimination of stderr.
+- Add nanobind interface
 
 */
+
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <nanobind/nanobind.h>
+#include <nanobind/ndarray.h>
+#include <nanobind/stl/string.h>
+
+#include "array_support.h"
 
 #include <stdint.h>
 #include <stdio.h>
@@ -37,6 +47,9 @@ elimination of stderr.
 #define STL_INVALID 0
 #define STL_ASCII 1
 #define STL_BINARY 2
+
+namespace nb = nanobind;
+using namespace nb::literals;
 
 typedef int STL_STATUS;
 
@@ -141,12 +154,12 @@ int loadstl(FILE *fp, char *comment, float **vertp, vertex_t *nvertp,
 
   ntris = get32(buf + 80);
 
-  tris = malloc(ntris * 3 * sizeof tris[0]);
-  attrs = malloc(ntris * sizeof attrs[0]);
-  verts = malloc(3 * ntris * 3 * sizeof verts[0]);
+  tris = (vertex_t *)malloc(ntris * 3 * sizeof tris[0]);
+  attrs = (uint16_t *)malloc(ntris * sizeof attrs[0]);
+  verts = (uint32_t *)malloc(3 * ntris * 3 * sizeof verts[0]);
 
   vhtcap = nextpow2(4 * ntris);
-  vht = malloc(vhtcap * sizeof vht[0]);
+  vht = (vertex_t *)malloc(vhtcap * sizeof vht[0]);
   memset(vht, 0, vhtcap * sizeof vht[0]);
 
   /* fprintf(stderr, "loadstl: number of triangles: %u, vhtcap %d\n", ntris,
@@ -181,7 +194,7 @@ int loadstl(FILE *fp, char *comment, float **vertp, vertex_t *nvertp,
   }
 
   free(vht);
-  verts = realloc(verts, nverts * 3 * sizeof verts[0]);
+  verts = (uint32_t *)realloc(verts, nverts * 3 * sizeof verts[0]);
   *vertp = (float *)verts;
   *nvertp = nverts;
   *trip = tris;
@@ -196,3 +209,34 @@ exit_fail:
   free(attrs);
   return -1;
 }
+
+nb::tuple GetStlData(const std::string &filename) {
+  FILE *fp = fopen(filename.c_str(), "rb");
+  if (!fp) {
+    throw std::runtime_error("File not found: " + filename);
+  }
+
+  char comment[80];
+  float *vertp;
+  unsigned int nverts;
+  unsigned int *trip;
+  unsigned short *attrp;
+  unsigned int ntrip;
+
+  int result = loadstl(fp, comment, &vertp, &nverts, &trip, &attrp, &ntrip);
+  fclose(fp);
+
+  if (result == -2) {
+    throw std::runtime_error("Invalid or unrecognized STL file format.");
+  } else if (result != 0) {
+    throw std::runtime_error("Failed to load STL file.");
+  }
+
+  NDArray<float, 2> vert_arr = WrapNDarray<float, 2>(vertp, {(int)nverts, 3});
+  NDArray<unsigned int, 2> face_arr =
+      WrapNDarray<unsigned int, 2>(trip, {(int)ntrip, 3});
+
+  return nb::make_tuple(vert_arr, face_arr);
+}
+
+NB_MODULE(stl_reader, m) { m.def("get_stl_data", &GetStlData); }

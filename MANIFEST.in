@@ -1,2 +1,0 @@
-include stl_reader/_stlfile_wrapper.pyx
-global-exclude stl_reader/_stlfile_wrapper.c

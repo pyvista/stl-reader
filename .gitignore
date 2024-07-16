@@ -4,6 +4,13 @@ build/
 dist/
 
 # Compiled
-stl_reader/_stlfile_wrapper.c
 *.so
 *.pyc
+
+# cmake
+#######
+CMakeCache.txt
+CMakeFiles/
+Makefile
+cmake_install.cmake
+compile_commands.json
