@@ -18,7 +18,6 @@ classifiers = [
   "Programming Language :: Python :: 3.12"
 ]
 dependencies = [
-  "pyvista",
   "numpy"
 ]
 description = "Read in STL files"
@@ -42,6 +41,11 @@ MACOSX_DEPLOYMENT_TARGET = "10.14"  # Needed for full C++17 support on MacOS
 [tool.codespell]
 quiet-level = 3
 skip = '*.cxx,*.h,*.gif,*.png,*.jpg,*.js,*.html,*.doctree,*.ttf,*.woff,*.woff2,*.eot,*.mp4,*.inv,*.pickle,*.ipynb,flycheck*,./.git/*,./.hypothesis/*,*.yml,./doc/build/*,./doc/images/*,./dist/*,*~,.hypothesis*,*.cpp,*.c'
+
+[tool.mypy]
+plugins = ["numpy.typing.mypy_plugin", 'npt_promote']
+# disable_error_code = ['assignment', 'index', 'misc']
+strict = true
 
 [tool.pytest.ini_options]
 filterwarnings = [

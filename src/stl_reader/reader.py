@@ -1,11 +1,23 @@
 """Read a STL file using a wrapper of https://github.com/aki5/libstl."""
 
+from typing import TYPE_CHECKING, Tuple
+
 import numpy as np
+import numpy.typing as npt
 
 from stl_reader import stl_reader as _stlfile_wrapper
 
+if TYPE_CHECKING:
+    from pyvista.core.pointset import PolyData
 
-def _polydata_from_faces(points, faces):
+
+def _check_stl_ascii(filename: str) -> bool:
+    """Check if a STL is ASCII."""
+    with open(filename, "rb") as fid:
+        return fid.read(5) == b"solid"
+
+
+def _polydata_from_faces(points: npt.NDArray[float], faces: npt.NDArray[int]) -> "PolyData":
     """Generate a polydata from a faces array containing no padding and all triangles.
 
     This is a more efficient way of instantiating PolyData from point and face
@@ -20,7 +32,7 @@ def _polydata_from_faces(points, faces):
 
     """
     try:
-        import pyvista as pv
+        from pyvista.core.pointset import PolyData
     except ModuleNotFoundError:
         raise ModuleNotFoundError(
             "To use this functionality, install PyVista with:\n\npip install pyvista"
@@ -33,14 +45,14 @@ def _polydata_from_faces(points, faces):
 
     # zero copy polydata creation
     offset = np.arange(0, faces.size + 1, faces.shape[1], dtype=ID_TYPE)
-    pdata = pv.PolyData()
+    pdata = PolyData()
     pdata.points = points
     pdata.faces = CellArray.from_arrays(offset, faces)
 
     return pdata
 
 
-def read(filename):
+def read(filename: str) -> Tuple[npt.NDArray[np.float32], npt.NDArray[np.uint32]]:
     """
     Read a binary STL file and returns the vertices and points.
 
@@ -87,10 +99,13 @@ def read(filename):
            [9005998, 9005999, 9005995]], dtype=uint32)
 
     """
+    if _check_stl_ascii(filename):
+        raise RuntimeError("stl-reader only supports binary STL files")
+
     return _stlfile_wrapper.get_stl_data(filename)
 
 
-def read_as_mesh(filename):
+def read_as_mesh(filename: str) -> "PolyData":
     """
     Read a binary STL file and return it as a mesh.
 
@@ -133,5 +148,12 @@ def read_as_mesh(filename):
     Requires the ``pyvista`` library.
 
     """
+    try:
+        from pyvista import ID_TYPE
+    except ModuleNotFoundError:
+        raise ModuleNotFoundError(
+            "To use this functionality, install PyVista with:\n\npip install pyvista"
+        )
     vertices, indices = read(filename)
-    return _polydata_from_faces(vertices, indices)
+    indices_int = indices.astype(ID_TYPE, copy=False)
+    return _polydata_from_faces(vertices, indices_int)
