@@ -11,12 +11,6 @@ if TYPE_CHECKING:
     from pyvista.core.pointset import PolyData
 
 
-def _check_stl_ascii(filename: str) -> bool:
-    """Check if a STL is ASCII."""
-    with open(filename, "rb") as fid:
-        return fid.read(5) == b"solid"
-
-
 def _polydata_from_faces(points: npt.NDArray[float], faces: npt.NDArray[int]) -> "PolyData":
     """Generate a polydata from a faces array containing no padding and all triangles.
 
@@ -99,9 +93,6 @@ def read(filename: str) -> Tuple[npt.NDArray[np.float32], npt.NDArray[np.uint32]
            [9005998, 9005999, 9005995]], dtype=uint32)
 
     """
-    if _check_stl_ascii(filename):
-        raise RuntimeError("stl-reader only supports binary STL files")
-
     return _stlfile_wrapper.get_stl_data(filename)
 
 
