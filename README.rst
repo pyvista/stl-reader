@@ -11,8 +11,10 @@
    :target: https://opensource.org/licenses/MIT
 
 ``stl-reader`` is a Python library for raipidly reading binary STL
-files. It wraps a Cython interface to the fast STL library provided by
-`libstl <https://github.com/aki5/libstl>`_. Thanks @aki5!
+files. It wraps a `nanobind
+<https://nanobind.readthedocs.io/en/latest/>`_ interface to the fast STL
+library provided by `libstl <https://github.com/aki5/libstl>`_. Thanks
+@aki5!
 
 The main advantage of ``stl-reader`` over other STL reading libraries is
 its performance. It is particularly well-suited for large files, mainly
