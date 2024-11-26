@@ -135,6 +135,62 @@ STL_STATUS check_stl_format(FILE *fp) {
   return STL_BINARY;
 }
 
+// Fast string to float reader
+static inline float fast_atof(const char *&p) {
+  bool neg = false;
+  if (*p == '-') {
+    neg = true;
+    ++p;
+  } else if (*p == '+') {
+    ++p;
+  }
+
+  double integer_part = 0.0;
+  while (*p >= '0' && *p <= '9') {
+    integer_part = integer_part * 10.0 + (*p - '0');
+    ++p;
+  }
+
+  double fraction_part = 0.0;
+  double fraction_scale = 1.0;
+  if (*p == '.') {
+    ++p;
+    while (*p >= '0' && *p <= '9') {
+      fraction_part = fraction_part * 10.0 + (*p - '0');
+      fraction_scale *= 10.0;
+      ++p;
+    }
+  }
+
+  double exponent = 0.0;
+  if (*p == 'e' || *p == 'E') {
+    ++p;
+    bool exp_neg = false;
+    if (*p == '-') {
+      exp_neg = true;
+      ++p;
+    } else if (*p == '+') {
+      ++p;
+    }
+    while (*p >= '0' && *p <= '9') {
+      exponent = exponent * 10.0 + (*p - '0');
+      ++p;
+    }
+    if (exp_neg)
+      exponent = -exponent;
+  }
+
+  double result = (integer_part + fraction_part / fraction_scale);
+  if (exponent != 0.0) {
+    result *= pow(10.0, exponent);
+  }
+
+  if (neg)
+    result = -result;
+
+  return static_cast<float>(result);
+}
+
 int loadstl_ascii(FILE *fp, char *comment, float **vertp, vertex_t *nvertp,
                   vertex_t **trip, uint16_t **attrp, triangle_t *ntrip) {
   // Read the entire file into memory
@@ -154,8 +210,8 @@ int loadstl_ascii(FILE *fp, char *comment, float **vertp, vertex_t *nvertp,
   }
   fileBuffer[fileSize] = '\0'; // Null-terminate the buffer
 
-  char *ptr = fileBuffer;
-  char *end = fileBuffer + fileSize;
+  const char *ptr = fileBuffer;
+  const char *end = fileBuffer + fileSize;
 
   // Extract the comment from the first line
   if (sscanf(ptr, "solid %79[^\n]", comment) != 1) {
@@ -169,7 +225,7 @@ int loadstl_ascii(FILE *fp, char *comment, float **vertp, vertex_t *nvertp,
 
   // First, estimate the number of triangles
   triangle_t ntris_estimate = 0;
-  char *scan_ptr = ptr;
+  const char *scan_ptr = ptr;
   while (scan_ptr < end) {
     // Skip whitespace
     while (scan_ptr < end && isspace(*scan_ptr))
@@ -252,40 +308,20 @@ int loadstl_ascii(FILE *fp, char *comment, float **vertp, vertex_t *nvertp,
         ptr++;
       // Parse three floats
       float x, y, z;
-      char *endptr;
 
-      x = strtof(ptr, &endptr);
-      if (ptr == endptr) {
-        fprintf(stderr, "Failed to parse X coordinate\n");
-        free(fileBuffer);
-        free(tris);
-        free(verts);
-        free(vht);
-        return -1;
-      }
-      ptr = endptr;
+      x = fast_atof(ptr);
+      while (ptr < end && isspace(*ptr))
+        ptr++;
 
-      y = strtof(ptr, &endptr);
-      if (ptr == endptr) {
-        fprintf(stderr, "Failed to parse Y coordinate\n");
-        free(fileBuffer);
-        free(tris);
-        free(verts);
-        free(vht);
-        return -1;
-      }
-      ptr = endptr;
+      y = fast_atof(ptr);
+      while (ptr < end && isspace(*ptr))
+        ptr++;
 
-      z = strtof(ptr, &endptr);
-      if (ptr == endptr) {
-        fprintf(stderr, "Failed to parse Z coordinate\n");
-        free(fileBuffer);
-        free(tris);
-        free(verts);
-        free(vht);
-        return -1;
-      }
-      ptr = endptr;
+      z = fast_atof(ptr);
+      while (ptr < end && *ptr != '\n')
+        ptr++;
+      if (ptr < end)
+        ptr++;
 
       if (v_idx < 3) {
         vert[0] = float_to_uint32(x);
@@ -311,12 +347,55 @@ int loadstl_ascii(FILE *fp, char *comment, float **vertp, vertex_t *nvertp,
         for (int i = 0; i < 3; i++) {
           vi[i] = vertex(verts, nverts, vht, vhtcap, v[i]);
           if (vi[i] == ~(vertex_t)0) {
-            fprintf(stderr, "Vertex hash table is full\n");
-            free(fileBuffer);
-            free(tris);
-            free(verts);
-            free(vht);
-            return -1;
+            // Hash table is full, need to resize
+            vertex_t old_vhtcap = vhtcap;
+            vertex_t *old_vht = vht;
+            vhtcap *= 2;
+            vht = (vertex_t *)calloc(vhtcap, sizeof(vertex_t));
+            if (!vht) {
+              fprintf(stderr, "Memory allocation failed for vht\n");
+              free(fileBuffer);
+              free(tris);
+              free(verts);
+              free(old_vht);
+              return -1;
+            }
+            // Rehash existing entries
+            for (vertex_t idx = 0; idx < old_vhtcap; idx++) {
+              if (old_vht[idx] != 0) {
+                vertex_t vi_old = old_vht[idx] - 1;
+                uint32_t *vert_old = verts + 3 * vi_old;
+                vertex_t hash = final96(vert_old[0], vert_old[1], vert_old[2]);
+                vertex_t j;
+                for (j = 0; j < vhtcap; j++) {
+                  vertex_t *vip_new = vht + ((hash + j) & (vhtcap - 1));
+                  if (*vip_new == 0) {
+                    *vip_new = vi_old + 1;
+                    break;
+                  }
+                }
+                if (j == vhtcap) {
+                  fprintf(stderr, "Failed to rehash during vht resize\n");
+                  free(fileBuffer);
+                  free(tris);
+                  free(verts);
+                  free(old_vht);
+                  free(vht);
+                  return -1;
+                }
+              }
+            }
+            free(old_vht);
+            // Now retry inserting the current vertex
+            vi[i] = vertex(verts, nverts, vht, vhtcap, v[i]);
+            if (vi[i] == ~(vertex_t)0) {
+              fprintf(stderr, "Vertex hash table is full after resizing\n");
+              free(fileBuffer);
+              free(tris);
+              free(verts);
+              free(vht);
+              return -1;
+            }
           }
           if (vi[i] == nverts) {
             if (nverts >= verts_cap) {
