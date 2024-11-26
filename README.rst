@@ -10,8 +10,8 @@
 .. |MIT| image:: https://img.shields.io/badge/License-MIT-yellow.svg
    :target: https://opensource.org/licenses/MIT
 
-``stl-reader`` is a Python library for raipidly reading binary STL
-files. It wraps a `nanobind
+``stl-reader`` is a Python library for rapidly reading binary and ASCII
+STL files. It wraps a `nanobind
 <https://nanobind.readthedocs.io/en/latest/>`_ interface to the fast STL
 library provided by `libstl <https://github.com/aki5/libstl>`_. Thanks
 @aki5!
@@ -168,6 +168,40 @@ Here's an additional benchmark comparing VTK with ``stl-reader``:
 .. image:: https://github.com/pyvista/stl-reader/raw/main/bench0.png
 
 .. image:: https://github.com/pyvista/stl-reader/raw/main/bench1.png
+
+Read in ASCII Meshes
+====================
+
+The `stl-reader` also supports ASCII files and is around 2.4 times
+faster than VTK at reading ASCII files.
+
+.. code:: python
+
+   import time
+   import stl_reader
+   import pyvista as pv
+   import numpy as np
+
+   # create and save a ASCII file
+   n = 1000
+   mesh = pv.Plane(i_resolution=n, j_resolution=n).triangulate()
+   mesh.save("/tmp/tmp-ascii.stl", binary=False)
+
+   # stl reader
+   tstart = time.time()
+   mesh = stl_reader.read_as_mesh("/tmp/tmp-ascii.stl")
+   print("stl-reader    ", time.time() - tstart)
+
+   tstart = time.time()
+   pv_mesh = pv.read("/tmp/tmp-ascii.stl")
+   print("pyvista reader", time.time() - tstart)
+
+   # verify meshes are identical
+   assert np.allclose(mesh.points, pv_mesh.points)
+
+   # approximate time to read in the 1M point file:
+   # stl-reader     0.80303955078125
+   # pyvista reader 1.916085958480835
 
 *****************************
  License and Acknowledgments

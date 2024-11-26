@@ -71,8 +71,7 @@ def test_read_binary() -> None:
 
 
 def test_read_ascii() -> None:
-    with pytest.raises(RuntimeError):
-        stl_reader.read(TEST_FILE_ASCII)
+    points, ind = stl_reader.read(TEST_FILE_ASCII)
 
 
 @pytest.mark.skipif(not PYVISTA_INSTALLED, reason="Requires PyVista")  # type: ignore

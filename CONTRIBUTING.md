@@ -9,7 +9,7 @@ extensions.
 If using emacs and helm, generate the project configuration files using `-DCMAKE_EXPORT_COMPILE_COMMANDS=ON`. Here's a sample configuration for C++11 on Linux:
 
 ```
-pip install nanobind
+pip install nanobind -U
 export NANOBIND_INCLUDE=$(python -c "import nanobind, os; print(os.path.join(os.path.dirname(nanobind.__file__), 'cmake'))")
 cmake -Dnanobind_DIR=$NANOBIND_INCLUDE -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES="/usr/include/c++/11;/usr/include/x86_64-linux-gnu/c++/11/;/usr/lib/gcc/x86_64-linux-gnu/11/include/"
 ```
