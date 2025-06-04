@@ -24,7 +24,7 @@ description = "Read in STL files"
 name = "stl-reader"
 readme = "README.rst"
 requires-python = ">=3.9"
-version = "0.2.2"
+version = "0.2.3"
 
 [tool.cibuildwheel]
 archs = ["auto64"]  # 64-bit only
