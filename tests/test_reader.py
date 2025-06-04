@@ -80,3 +80,4 @@ def test_read_as_mesh() -> None:
 
     stl_mesh = stl_reader.read_as_mesh(TEST_FILE_BINARY)
     assert pv_mesh == stl_mesh
+    assert stl_mesh._connectivity_array.dtype == np.int32

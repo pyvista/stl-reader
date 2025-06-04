@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     from pyvista.core.pointset import PolyData
 
 
-def _polydata_from_faces(points: npt.NDArray[float], faces: npt.NDArray[np.int32]) -> "PolyData":
+def _polydata_from_faces(points: npt.NDArray[float], faces: npt.NDArray[int]) -> "PolyData":
     """Generate a polydata from a faces array containing no padding and all triangles.
 
     This is a more efficient way of instantiating PolyData from point and face
@@ -157,5 +157,13 @@ def read_as_mesh(filename: str) -> "PolyData":
 
     """
     vertices, indices = read(filename)
-    indices_int = indices.astype(np.int32, copy=False)
-    return _polydata_from_faces(vertices, indices_int)
+
+    # while faces might be correctly sized, the required offset might exceed np.int32
+    dtype = np.int64 if indices.size >= np.iinfo(np.int32).max else np.int32
+
+    # check if we can support int32 conversion
+    if vertices.shape[0] > np.iinfo(np.int32).max:
+        dtype = np.int64
+
+    indices_int = indices.astype(dtype, copy=False)
+    return _polydata_from_faces(vertices, indices_int)  # type: ignore
