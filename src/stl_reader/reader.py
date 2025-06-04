@@ -32,17 +32,34 @@ def _polydata_from_faces(points: npt.NDArray[float], faces: npt.NDArray[int]) ->
             "To use this functionality, install PyVista with:\n\npip install pyvista"
         )
 
-    from pyvista import ID_TYPE, CellArray
+    from vtkmodules.util.numpy_support import numpy_to_vtk as numpy_to_vtk
+    from vtkmodules.vtkCommonCore import vtkTypeInt32Array, vtkTypeInt64Array
+    from vtkmodules.vtkCommonDataModel import vtkCellArray
 
     if faces.ndim != 2:
         raise ValueError("Expected a two dimensional face array.")
 
-    # zero copy polydata creation
-    offset = np.arange(0, faces.size + 1, faces.shape[1], dtype=ID_TYPE)
+    if faces.dtype == np.int32:
+        vtk_dtype = vtkTypeInt32Array().GetDataType()
+    elif faces.dtype == np.int64:
+        vtk_dtype = vtkTypeInt64Array().GetDataType()
+    else:
+        raise TypeError(f"Unsupported dtype ({type(faces)} for faces. Expected int32 or int64.")
+
+    # convert to vtk arrays without copying
+    offset = np.arange(0, faces.size + 1, faces.shape[1], dtype=faces.dtype)
+    offset_vtk = numpy_to_vtk(offset, deep=False, array_type=vtk_dtype)
+    faces_vtk = numpy_to_vtk(faces.ravel(), deep=False, array_type=vtk_dtype)
+
+    # create the vtk arrays and keep references to avoid gc
+    carr = vtkCellArray()
+    carr.SetData(offset_vtk, faces_vtk)
+    carr._offset_np_ref = offset_vtk
+    carr._faces_np_ref = faces_vtk
+
     pdata = PolyData()
     pdata.points = points
-    pdata.faces = CellArray.from_arrays(offset, faces)
-
+    pdata.SetPolys(carr)
     return pdata
 
 
@@ -139,12 +156,14 @@ def read_as_mesh(filename: str) -> "PolyData":
     Requires the ``pyvista`` library.
 
     """
-    try:
-        from pyvista import ID_TYPE
-    except ModuleNotFoundError:
-        raise ModuleNotFoundError(
-            "To use this functionality, install PyVista with:\n\npip install pyvista"
-        )
     vertices, indices = read(filename)
-    indices_int = indices.astype(ID_TYPE, copy=False)
-    return _polydata_from_faces(vertices, indices_int)
+
+    # while faces might be correctly sized, the required offset might exceed np.int32
+    dtype = np.int64 if indices.size >= np.iinfo(np.int32).max else np.int32
+
+    # check if we can support int32 conversion
+    if vertices.shape[0] > np.iinfo(np.int32).max:
+        dtype = np.int64
+
+    indices_int = indices.astype(dtype, copy=False)
+    return _polydata_from_faces(vertices, indices_int)  # type: ignore
