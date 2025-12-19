@@ -11,7 +11,6 @@ classifiers = [
   "Operating System :: Microsoft :: Windows",
   "Operating System :: POSIX",
   "Intended Audience :: Science/Research",
-  "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
@@ -23,12 +22,13 @@ dependencies = [
 description = "Read in STL files"
 name = "stl-reader"
 readme = "README.rst"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 version = "0.3.dev0"
 
 [tool.cibuildwheel]
 archs = ["auto64"]  # 64-bit only
-skip = "cp37-* pp* *musllinux*"  # disable PyPy and musl-based wheels
+build = "cp310-* cp311-* cp312-* cp313-*"
+skip = "*musllinux*"  # disable PyPy and musl-based wheels
 test-command = "pytest {project}/tests"
 test-requires = "pytest pyvista"
 
