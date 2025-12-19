@@ -27,8 +27,8 @@ version = "0.3.dev0"
 
 [tool.cibuildwheel]
 archs = ["auto64"]  # 64-bit only
-build = "cp310-* cp311-* cp312-* cp313-*"
-skip = "*musllinux*"  # disable PyPy and musl-based wheels
+build = "cp310-* cp311-* cp312-* cp313-* cp314*"
+skip = " cp314t-* *musllinux*"  # disable musl-based wheels and free threading
 test-command = "pytest {project}/tests"
 test-requires = "pytest pyvista"
 
