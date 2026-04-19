@@ -10,6 +10,14 @@ from stl_reader import stl_reader as _stlfile_wrapper
 if TYPE_CHECKING:
     from pyvista.core.pointset import PolyData
 
+try:
+    # Available in pyvista >= 0.48: download remote files on read
+    from pyvista import LocalFileRequiredError as _LocalFileRequiredError
+    from pyvista import has_scheme as _has_scheme
+except ImportError:
+    _LocalFileRequiredError = None
+    _has_scheme = None
+
 
 def _polydata_from_faces(points: npt.NDArray[float], faces: npt.NDArray[int]) -> "PolyData":
     """Generate a polydata from a faces array containing no padding and all triangles.
@@ -110,6 +118,11 @@ def read(filename: str) -> Tuple[npt.NDArray[np.float32], npt.NDArray[np.uint32]
            [9005998, 9005999, 9005995]], dtype=uint32)
 
     """
+    filename = str(filename)
+    # When invoked via the ``pyvista.readers`` entry point with a remote
+    # URI, signal PyVista to download the file and retry locally.
+    if _has_scheme is not None and _has_scheme(filename):
+        raise _LocalFileRequiredError
     return _stlfile_wrapper.get_stl_data(filename)
 
 

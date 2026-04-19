@@ -1,6 +1,10 @@
 """Test stl_reader."""
 
 import os
+from importlib.metadata import entry_points
+from typing import Any
+from typing import Callable
+
 import numpy as np
 import pytest
 
@@ -9,10 +13,13 @@ import stl_reader
 
 try:
     import pyvista as pv
+    from packaging.version import Version
 
     PYVISTA_INSTALLED = True
+    _HAS_READER_REGISTRY = Version(pv.__version__) >= Version("0.48.dev0")
 except ImportError:
     PYVISTA_INSTALLED = False
+    _HAS_READER_REGISTRY = False
 
 THIS_PATH = os.path.dirname(os.path.abspath(__file__))
 TEST_FILE_ASCII = os.path.join(THIS_PATH, "sphere_ascii.stl")
@@ -81,3 +88,34 @@ def test_read_as_mesh() -> None:
     stl_mesh = stl_reader.read_as_mesh(TEST_FILE_BINARY)
     assert pv_mesh == stl_mesh
     assert stl_mesh._connectivity_array.dtype == np.int32
+
+
+def test_entry_point_registered() -> None:
+    """``read_as_mesh`` is advertised on the ``pyvista.readers`` group."""
+    matches = [ep for ep in entry_points(group="pyvista.readers") if ep.name == ".stl"]
+    assert matches, "stl_reader did not publish a '.stl' entry point"
+    assert matches[0].value == "stl_reader:read_as_mesh"
+    assert matches[0].load() is stl_reader.read_as_mesh
+
+
+@pytest.mark.skipif(
+    not _HAS_READER_REGISTRY,
+    reason="requires pyvista >= 0.48 entry-point hooks",
+)  # type: ignore
+@pytest.mark.parametrize("func", [stl_reader.read, stl_reader.read_as_mesh])  # type: ignore
+def test_read_raises_for_remote_uri(func: Callable[[str], Any]) -> None:
+    """Remote URIs raise :class:`pyvista.LocalFileRequiredError` so PyVista downloads first."""
+    with pytest.raises(pv.LocalFileRequiredError):
+        func("https://example.com/mesh.stl")
+
+
+@pytest.mark.skipif(
+    not _HAS_READER_REGISTRY,
+    reason="requires pyvista >= 0.48 reader registry",
+)  # type: ignore
+def test_pv_read_dispatches_to_entry_point() -> None:
+    """``pv.read('*.stl')`` resolves to ``stl_reader.read_as_mesh`` via the registry."""
+    pv.read(TEST_FILE_BINARY)
+    from pyvista.core.utilities import reader_registry
+
+    assert reader_registry._custom_ext_readers.get(".stl") is stl_reader.read_as_mesh
