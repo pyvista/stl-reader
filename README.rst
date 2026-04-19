@@ -91,6 +91,16 @@ Alternatively, you can load in the STL file as a PyVista PolyData:
      Z Bounds:   -5.551e-17, 5.551e-17
      N Arrays:   0
 
+When ``stl_reader`` is installed alongside ``pyvista >= 0.48``,
+``pyvista.read`` automatically dispatches ``.stl`` files through
+``stl_reader`` via the ``pyvista.readers`` entry point, no manual
+registration is required:
+
+.. code:: pycon
+
+   >>> import pyvista as pv
+   >>> mesh = pv.read("example.stl")  # now powered by stl_reader
+
 ***********
  Benchmark
 ***********

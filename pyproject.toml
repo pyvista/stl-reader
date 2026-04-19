@@ -26,6 +26,13 @@ readme = "README.rst"
 requires-python = ">=3.10"
 version = "0.3.dev0"
 
+# Requires pyvista >= 0.48
+[project.entry-points."pyvista.readers"]
+".stl" = "stl_reader:read_as_mesh"
+
+[project.optional-dependencies]
+pyvista = ["pyvista"]
+
 [tool.cibuildwheel]
 archs = ["auto64"]  # 64-bit only
 build = "cp310-* cp311-* cp312-* cp313-* cp314*"
