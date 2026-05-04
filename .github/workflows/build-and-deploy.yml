@@ -13,37 +13,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build_sdist:
-    name: Build source distribution
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-
-    - uses: actions/setup-python@v5
-      with:
-        python-version: '3.13'
-
-    - name: Build sdist
-      run: pipx run build --sdist
-
-    - name: Install from sdist
-      run: pip install dist/pyvista_stl*.tar.gz
-
-    - name: Run tests
-      run: |
-        pip install pyvista pytest
-        pytest -x
-
-    - uses: actions/upload-artifact@v4
-      with:
-        name: pyvista-stl-sdist
-        path: dist/*.tar.gz
-
   build_wheels:
     name: Build wheels on ${{ matrix.os }}
-    needs: [build_sdist]
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -51,29 +22,53 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-
-    - uses: actions/download-artifact@v4
       with:
-        name: pyvista-stl-sdist
-        path: sdist
-
-    - name: Extract sdist
-      shell: bash
-      run: |
-        mkdir -p src-from-sdist
-        tar -xzf sdist/pyvista_stl-*.tar.gz -C src-from-sdist --strip-components=1
+        fetch-depth: 0  # required for setuptools_scm
 
     - name: Build wheels
       uses: pypa/cibuildwheel@v3.3.0
-      with:
-        package-dir: src-from-sdist
 
     - uses: actions/upload-artifact@v4
       with:
         name: pyvista-stl-wheels-${{ matrix.os }}
         path: ./wheelhouse/*.whl
 
+  build_sdist:
+    name: Build source distribution
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # required for setuptools_scm
+
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.13'
+
+    - name: Build sdist
+      run: |
+        sudo apt-get update
+        sudo apt-get install ninja-build -y
+        pipx run build --sdist
+
+    - name: Validate wheel metadata
+      run: |
+        pip install twine
+        twine check dist/*
+
+    - name: Validate sdist
+      run: |
+        pip install dist/*
+        pip install pytest pyvista
+        pytest
+
+    - uses: actions/upload-artifact@v4
+      with:
+        name: pyvista-stl-sdist
+        path: dist/*.tar.gz
+
   upload_pypi:
+    name: Publish to PyPI
     needs: [build_wheels, build_sdist]
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
@@ -81,24 +76,24 @@ jobs:
       name: pypi
       url: https://pypi.org/p/pyvista-stl
     permissions:
-      id-token: write  # OIDC trusted publishing
-      contents: write  # required to create a release
+      id-token: write  # mandatory for PyPI trusted publishing (OIDC)
+      contents: write  # required to create a GitHub Release
     steps:
     - uses: actions/download-artifact@v4
       with:
         path: dist
         merge-multiple: true
         pattern: pyvista-stl-*
-
     - run: ls -alR dist/
-
     - name: Publish package distributions to PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
-
     - name: Create GitHub Release
-      uses: softprops/action-gh-release@v2
-      with:
-        generate_release_notes: true
-        files: |
-          ./dist/*.whl
-          ./dist/*.tar.gz
+      env:
+        GH_TOKEN: ${{ github.token }}
+        TAG: ${{ github.ref_name }}
+      run: |
+        gh release create "$TAG" \
+          --repo "$GITHUB_REPOSITORY" \
+          --title "$TAG" \
+          --generate-notes \
+          ./dist/*.whl ./dist/*.tar.gz
