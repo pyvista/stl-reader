@@ -1,26 +1,26 @@
-############
- stl-reader
-############
+#############
+ pyvista-stl
+#############
 
 |pypi| |MIT|
 
-.. |pypi| image:: https://img.shields.io/pypi/v/stl-reader.svg?logo=python&logoColor=white
-   :target: https://pypi.org/project/stl-reader/
+.. |pypi| image:: https://img.shields.io/pypi/v/pyvista-stl.svg?logo=python&logoColor=white
+   :target: https://pypi.org/project/pyvista-stl/
 
 .. |MIT| image:: https://img.shields.io/badge/License-MIT-yellow.svg
    :target: https://opensource.org/licenses/MIT
 
-``stl-reader`` is a Python library for rapidly reading binary and ASCII
+``pyvista-stl`` is a Python library for rapidly reading binary and ASCII
 STL files. It wraps a `nanobind
 <https://nanobind.readthedocs.io/en/latest/>`_ interface to the fast STL
 library provided by `libstl <https://github.com/aki5/libstl>`_. Thanks
 @aki5!
 
-The main advantage of ``stl-reader`` over other STL reading libraries is
-its performance. It is particularly well-suited for large files, mainly
-due to its efficient use of hashing when merging points. This results in
-a 5-35x speedup over VTK for files containing between 4,000 and
-9,000,000 points.
+The main advantage of ``pyvista-stl`` over other STL reading libraries
+is its performance. It is particularly well-suited for large files,
+mainly due to its efficient use of hashing when merging points. This
+results in a 5-35x speedup over VTK for files containing between 4,000
+and 9,000,000 points.
 
 See the benchmarks below for more details.
 
@@ -28,18 +28,18 @@ See the benchmarks below for more details.
  Installation
 **************
 
-The recommended way to install ``stl-reader`` is via PyPI:
+The recommended way to install ``pyvista-stl`` is via PyPI:
 
 .. code:: sh
 
-   pip install stl-reader
+   pip install pyvista-stl
 
 You can also clone the repository and install it from source:
 
 .. code:: sh
 
-   git clone https://github.com/pyvista/stl-reader.git
-   cd stl-reader
+   git clone https://github.com/pyvista/pyvista-stl.git
+   cd pyvista-stl
    pip install .
 
 *******
@@ -51,8 +51,8 @@ array:
 
 .. code:: pycon
 
-   >>> import stl_reader
-   >>> vertices, indices = stl_reader.read("example.stl")
+   >>> import pyvista_stl
+   >>> vertices, indices = pyvista_stl.read("example.stl")
    >>> vertices
    array([[-0.01671113,  0.5450843 , -0.8382146 ],
           [ 0.01671113,  0.5450843 , -0.8382146 ],
@@ -79,8 +79,8 @@ Alternatively, you can load in the STL file as a PyVista PolyData:
 
 .. code:: pycon
 
-   >>> import stl_reader
-   >>> mesh = stl_reader.read_as_mesh('example.stl')
+   >>> import pyvista_stl
+   >>> mesh = pyvista_stl.read_as_mesh('example.stl')
    >>> mesh
    PolyData (0x7f43063ec700)
      N Cells:    1280000
@@ -91,15 +91,15 @@ Alternatively, you can load in the STL file as a PyVista PolyData:
      Z Bounds:   -5.551e-17, 5.551e-17
      N Arrays:   0
 
-When ``stl_reader`` is installed alongside ``pyvista >= 0.48``,
+When ``pyvista-stl`` is installed alongside ``pyvista >= 0.48``,
 ``pyvista.read`` automatically dispatches ``.stl`` files through
-``stl_reader`` via the ``pyvista.readers`` entry point, no manual
+``pyvista_stl`` via the ``pyvista.readers`` entry point, no manual
 registration is required:
 
 .. code:: pycon
 
    >>> import pyvista as pv
-   >>> mesh = pv.read("example.stl")  # now powered by stl_reader
+   >>> mesh = pv.read("example.stl")  # now powered by pyvista_stl
 
 ***********
  Benchmark
@@ -114,7 +114,7 @@ Here are some timings from reading in a 1,000,000 point binary STL file:
 +-------------+-----------------------+
 | Library     | Time (seconds)        |
 +=============+=======================+
-| stl-reader  | 0.174                 |
+| pyvista-stl | 0.174                 |
 +-------------+-----------------------+
 | numpy-stl   | 0.201 (see note)      |
 +-------------+-----------------------+
@@ -129,7 +129,7 @@ Here are some timings from reading in a 1,000,000 point binary STL file:
 Comparison with VTK
 ===================
 
-Here's an additional benchmark comparing VTK with ``stl-reader``:
+Here's an additional benchmark comparing VTK with ``pyvista-stl``:
 
 .. code:: python
 
@@ -137,7 +137,7 @@ Here's an additional benchmark comparing VTK with ``stl-reader``:
    import time
    import pyvista as pv
    import matplotlib.pyplot as plt
-   import stl_reader
+   import pyvista_stl
 
    times = []
    filename = 'tmp.stl'
@@ -150,10 +150,10 @@ Here's an additional benchmark comparing VTK with ``stl-reader``:
        vtk_time = time.time() - tstart
 
        tstart = time.time()
-       out_stl = stl_reader.read(filename)
-       stl_reader_time =  time.time() - tstart
+       out_stl = pyvista_stl.read(filename)
+       pyvista_stl_time =  time.time() - tstart
 
-       times.append([mesh.n_points, vtk_time, stl_reader_time])
+       times.append([mesh.n_points, vtk_time, pyvista_stl_time])
        print(times[-1])
 
 
@@ -161,7 +161,7 @@ Here's an additional benchmark comparing VTK with ``stl-reader``:
    plt.figure(1)
    plt.title('STL load time')
    plt.plot(times[:, 0], times[:, 1], label='VTK')
-   plt.plot(times[:, 0], times[:, 2], label='stl_reader')
+   plt.plot(times[:, 0], times[:, 2], label='pyvista_stl')
    plt.xlabel('Number of Points')
    plt.ylabel('Time to Load (seconds)')
    plt.legend()
@@ -169,26 +169,26 @@ Here's an additional benchmark comparing VTK with ``stl-reader``:
    plt.figure(2)
    plt.title('STL load time (Log-Log)')
    plt.loglog(times[:, 0], times[:, 1], label='VTK')
-   plt.loglog(times[:, 0], times[:, 2], label='stl_reader')
+   plt.loglog(times[:, 0], times[:, 2], label='pyvista_stl')
    plt.xlabel('Number of Points')
    plt.ylabel('Time to Load (seconds)')
    plt.legend()
    plt.show()
 
-.. image:: https://github.com/pyvista/stl-reader/raw/main/bench0.png
+.. image:: https://github.com/pyvista/pyvista-stl/raw/main/bench0.png
 
-.. image:: https://github.com/pyvista/stl-reader/raw/main/bench1.png
+.. image:: https://github.com/pyvista/pyvista-stl/raw/main/bench1.png
 
 Read in ASCII Meshes
 ====================
 
-The `stl-reader` also supports ASCII files and is around 2.4 times
+The `pyvista-stl` also supports ASCII files and is around 2.4 times
 faster than VTK at reading ASCII files.
 
 .. code:: python
 
    import time
-   import stl_reader
+   import pyvista_stl
    import pyvista as pv
    import numpy as np
 
@@ -199,8 +199,8 @@ faster than VTK at reading ASCII files.
 
    # stl reader
    tstart = time.time()
-   mesh = stl_reader.read_as_mesh("/tmp/tmp-ascii.stl")
-   print("stl-reader    ", time.time() - tstart)
+   mesh = pyvista_stl.read_as_mesh("/tmp/tmp-ascii.stl")
+   print("pyvista-stl   ", time.time() - tstart)
 
    tstart = time.time()
    pv_mesh = pv.read("/tmp/tmp-ascii.stl")
@@ -210,7 +210,7 @@ faster than VTK at reading ASCII files.
    assert np.allclose(mesh.points, pv_mesh.points)
 
    # approximate time to read in the 1M point file:
-   # stl-reader     0.80303955078125
+   # pyvista-stl    0.80303955078125
    # pyvista reader 1.916085958480835
 
 *****************************
@@ -229,4 +229,4 @@ The work in this repository is also licensed under the MIT License.
 *********
 
 If you are having issues, please feel free to raise an `Issue
-<https://github.com/pyvista/stl-reader/issues>`_.
+<https://github.com/pyvista/pyvista-stl/issues>`_.

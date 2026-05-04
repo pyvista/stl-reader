@@ -1,11 +1,11 @@
-"""Stl reader library."""
+"""pyvista-stl reader library."""
 
 from importlib.metadata import PackageNotFoundError, version
 
-from stl_reader.reader import read, read_as_mesh
+from pyvista_stl.reader import read, read_as_mesh
 
 try:
-    __version__ = version("stl_reader")
+    __version__ = version("pyvista-stl")
 except PackageNotFoundError:
     __version__ = "unknown"
 

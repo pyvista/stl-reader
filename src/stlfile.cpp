@@ -574,4 +574,4 @@ nb::tuple GetStlData(const std::string &filename) {
   return nb::make_tuple(vert_arr, face_arr);
 }
 
-NB_MODULE(stl_reader, m) { m.def("get_stl_data", &GetStlData); }
+NB_MODULE(_core, m) { m.def("get_stl_data", &GetStlData); }

@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Tuple
 import numpy as np
 import numpy.typing as npt
 
-from stl_reader import stl_reader as _stlfile_wrapper
+from pyvista_stl import _core as _stlfile_wrapper
 
 if TYPE_CHECKING:
     from pyvista.core.pointset import PolyData
@@ -98,8 +98,8 @@ def read(filename: str) -> Tuple[npt.NDArray[np.float32], npt.NDArray[np.uint32]
 
     Example
     -------
-    >>> import stl_reader
-    >>> vertices, indices = stl_reader.read("example.stl")
+    >>> import pyvista_stl
+    >>> vertices, indices = pyvista_stl.read("example.stl")
     >>> vertices
     array([[-0.01671113,  0.5450843 , -0.8382146 ],
            [ 0.01671113,  0.5450843 , -0.8382146 ],
@@ -152,8 +152,8 @@ def read_as_mesh(filename: str) -> "PolyData":
 
     Example
     -------
-    >>> import stl_reader
-    >>> mesh = stl_reader.read_as_mesh("example.stl")
+    >>> import pyvista_stl
+    >>> mesh = pyvista_stl.read_as_mesh("example.stl")
     >>> mesh
     PolyData (0x7f43063ec700)
       N Cells:    1280000

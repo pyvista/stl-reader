@@ -21,14 +21,14 @@ dependencies = [
   "numpy"
 ]
 description = "Read in STL files"
-name = "stl-reader"
+name = "pyvista-stl"
 readme = "README.rst"
 requires-python = ">=3.10"
 version = "0.3.dev0"
 
 # Requires pyvista >= 0.48
 [project.entry-points."pyvista.readers"]
-".stl" = "stl_reader:read_as_mesh"
+".stl" = "pyvista_stl:read_as_mesh"
 
 [project.optional-dependencies]
 pyvista = ["pyvista"]
