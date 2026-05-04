@@ -13,7 +13,7 @@ find_package(nanobind CONFIG REQUIRED)
 
 nanobind_add_module(
   # Name of the extension
-  stl_reader
+  _core
 
   # Target the stable ABI for Python 3.12+, which reduces
   # the number of binary wheels that must be built. This
@@ -28,25 +28,25 @@ nanobind_add_module(
 
 # Link OpenMP
 # if(OpenMP_CXX_FOUND)
-#   target_link_libraries(stl_reader PRIVATE OpenMP::OpenMP_CXX)
+#   target_link_libraries(_core PRIVATE OpenMP::OpenMP_CXX)
 # endif()
 
 # Compiler-specific options
 if(MSVC)
   # Use MSVC optimization levels and OpenMP setup
-  target_compile_options(stl_reader PRIVATE /O2 /std:c++17)
+  target_compile_options(_core PRIVATE /O2 /std:c++17)
   # /openmp:llvm
 else()
   # Assuming GCC or Clang
-  target_compile_options(stl_reader PRIVATE -O3)
+  target_compile_options(_core PRIVATE -O3)
   # -fopenmp
 endif()
 
 # Example debugging
-# set solib-search-path /home/user/python/.venv311/lib/python3.11/site-packages/stl_reader/
+# set solib-search-path /home/user/python/.venv311/lib/python3.11/site-packages/pyvista_stl/
 # set breakpoint with b qual.cpp:4872
-# target_compile_options(stl_reader PRIVATE -g -O0)
+# target_compile_options(_core PRIVATE -g -O0)
 # target_compile_options(pfh PRIVATE -g -O0)
 
 # Install directive for scikit-build-core
-install(TARGETS stl_reader LIBRARY DESTINATION stl_reader)
+install(TARGETS _core LIBRARY DESTINATION pyvista_stl)

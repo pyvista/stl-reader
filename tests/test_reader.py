@@ -1,4 +1,4 @@
-"""Test stl_reader."""
+"""Test pyvista_stl."""
 
 import os
 from importlib.metadata import entry_points
@@ -8,7 +8,7 @@ from typing import Callable
 import numpy as np
 import pytest
 
-import stl_reader
+import pyvista_stl
 
 
 try:
@@ -72,20 +72,20 @@ EXPECTED_FACES = np.array(
 
 
 def test_read_binary() -> None:
-    points, ind = stl_reader.read(TEST_FILE_BINARY)
+    points, ind = pyvista_stl.read(TEST_FILE_BINARY)
     assert np.allclose(EXPECTED_POINTS, points)
     assert np.allclose(EXPECTED_FACES, ind)
 
 
 def test_read_ascii() -> None:
-    points, ind = stl_reader.read(TEST_FILE_ASCII)
+    points, ind = pyvista_stl.read(TEST_FILE_ASCII)
 
 
 @pytest.mark.skipif(not PYVISTA_INSTALLED, reason="Requires PyVista")  # type: ignore
 def test_read_as_mesh() -> None:
     pv_mesh = pv.read(TEST_FILE_BINARY)
 
-    stl_mesh = stl_reader.read_as_mesh(TEST_FILE_BINARY)
+    stl_mesh = pyvista_stl.read_as_mesh(TEST_FILE_BINARY)
     assert pv_mesh == stl_mesh
     assert stl_mesh._connectivity_array.dtype == np.int32
 
@@ -93,16 +93,16 @@ def test_read_as_mesh() -> None:
 def test_entry_point_registered() -> None:
     """``read_as_mesh`` is advertised on the ``pyvista.readers`` group."""
     matches = [ep for ep in entry_points(group="pyvista.readers") if ep.name == ".stl"]
-    assert matches, "stl_reader did not publish a '.stl' entry point"
-    assert matches[0].value == "stl_reader:read_as_mesh"
-    assert matches[0].load() is stl_reader.read_as_mesh
+    assert matches, "pyvista_stl did not publish a '.stl' entry point"
+    assert matches[0].value == "pyvista_stl:read_as_mesh"
+    assert matches[0].load() is pyvista_stl.read_as_mesh
 
 
 @pytest.mark.skipif(
     not _HAS_READER_REGISTRY,
     reason="requires pyvista >= 0.48 entry-point hooks",
 )  # type: ignore
-@pytest.mark.parametrize("func", [stl_reader.read, stl_reader.read_as_mesh])  # type: ignore
+@pytest.mark.parametrize("func", [pyvista_stl.read, pyvista_stl.read_as_mesh])  # type: ignore
 def test_read_raises_for_remote_uri(func: Callable[[str], Any]) -> None:
     """Remote URIs raise :class:`pyvista.LocalFileRequiredError` so PyVista downloads first."""
     with pytest.raises(pv.LocalFileRequiredError):
@@ -114,8 +114,8 @@ def test_read_raises_for_remote_uri(func: Callable[[str], Any]) -> None:
     reason="requires pyvista >= 0.48 reader registry",
 )  # type: ignore
 def test_pv_read_dispatches_to_entry_point() -> None:
-    """``pv.read('*.stl')`` resolves to ``stl_reader.read_as_mesh`` via the registry."""
+    """``pv.read('*.stl')`` resolves to ``pyvista_stl.read_as_mesh`` via the registry."""
     pv.read(TEST_FILE_BINARY)
     from pyvista.core.utilities import reader_registry
 
-    assert reader_registry._custom_ext_readers.get(".stl") is stl_reader.read_as_mesh
+    assert reader_registry._custom_ext_readers.get(".stl") is pyvista_stl.read_as_mesh
